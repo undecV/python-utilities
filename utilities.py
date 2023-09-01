@@ -11,7 +11,7 @@ def filenameify(string: str) -> str:
 
 
 def readable_size(number, suffix="B"):
-    """Readable Size."""
+    """Converts an integer into a human-readable data size unit."""
     # Reference:
     # https://stackoverflow.com/a/1094933
 
