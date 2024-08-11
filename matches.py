@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 import re
+from typing import Iterator
 
 
 class BadFormatError(ValueError):
@@ -16,6 +17,32 @@ def multiple_matches(text: str, patterns: list[re.Pattern]) -> re.Match:
     if not match:
         raise BadFormatError()
     return match
+
+
+def multiple_match(patterns: list[re.Pattern], string: str, flags: int | re.RegexFlag = 0) -> re.Match | None:
+    """
+    Tries to match the given string against a list of regex patterns.
+
+    Args:
+        patterns (List[re.Pattern]): A list of compiled regex patterns.
+        string (str): The string to be matched.
+        flags (Union[int, re.RegexFlag], optional): Flags to be passed to the match function. Defaults to 0.
+
+    Returns:
+        Optional[re.Match]: The first match object if a match is found, otherwise None.
+    """
+    for pattern in patterns:
+        match = re.match(pattern, string, flags)
+        if match:
+            return match
+    return None
+
+
+def multiple_finditer(patterns: list[re.Pattern], string: str) -> Iterator[re.Match[str]]:
+    """Yield all matches from multiple regular expression patterns."""
+    for pattern in patterns:
+        for match_ in re.finditer(pattern, string):
+            yield match_
 
 
 @dataclass
