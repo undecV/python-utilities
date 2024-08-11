@@ -7,29 +7,20 @@ Reference:
 - https://stackoverflow.com/a/33300001
 """
 
+from typing import Any
 import yaml
-
-from pygments import highlight
-from pygments.lexers import YamlLexer
-from pygments.formatters import TerminalFormatter
 
 
 DEFAULT_TILDE_NULL = True
 DEFAULT_DOUBLE_QUOTE = False
 
-YAML_CONFIG = {
+YAML_DUMP_CONFIG = {
     "indent": 2,
     "sort_keys": False,
     "allow_unicode": True,
     "width": float("inf"),
     # "default_flow_style": True,
 }
-
-
-def print_as_yaml(obj):
-    """Print obj as YAML Format with highlight by pygments."""
-    dumped = yaml.dump(obj, **YAML_CONFIG)
-    print(highlight(dumped, YamlLexer(), TerminalFormatter()))
 
 
 # Double Quote
@@ -43,12 +34,12 @@ if DEFAULT_DOUBLE_QUOTE:
     yaml.add_representer(str, string_representer)
 
 
-class DoubleQuoteStr(str, yaml.YAMLObject):
+class DoubleQuoteStr(str, yaml.YAMLObject):  # type: ignore
     """Represent a string as `\"String\"`."""
     yaml_tag = '!DoubleQuoteStr'
 
     @classmethod
-    def to_yaml(cls, dumper, data):
+    def to_yaml(cls, dumper: yaml.Dumper, data: Any) -> yaml.Node:
         return string_representer(dumper, data)
 
 
@@ -65,18 +56,18 @@ if DEFAULT_TILDE_NULL:
 
 # Flow Dict
 
-def dict_representer(dumper, data, flow_style=True):
+def dict_representer(dumper, data, flow_style=True):  # type: ignore
     """Force Represent Dict / Object as flow style."""
     return dumper.represent_mapping('tag:yaml.org,2002:map', data, flow_style=flow_style)
 
 
-class FlowDict(dict, yaml.YAMLObject):
+class FlowDict(dict, yaml.YAMLObject):  # type: ignore
     """Force Represent Dict / Object as flow style."""
     yaml_tag = '!FlowDict'
     yaml_flow_style = True
 
     @classmethod
-    def to_yaml(cls, dumper, data):
+    def to_yaml(cls, dumper: yaml.Dumper, data: Any) -> yaml.Node:
         return dict_representer(dumper, data, flow_style=cls.yaml_flow_style)
 
 
@@ -87,13 +78,13 @@ def list_representer(dumper, data, flow_style=True):
     return dumper.represent_sequence('tag:yaml.org,2002:seq', data, flow_style=flow_style)
 
 
-class FlowList(list, yaml.YAMLObject):
+class FlowList(list, yaml.YAMLObject):  # type: ignore
     """Force Represent List / Array as flow style."""
     yaml_tag = '!FlowList'
     yaml_flow_style = True
 
     @classmethod
-    def to_yaml(cls, dumper, data):
+    def to_yaml(cls, dumper: yaml.Dumper, data: Any) -> yaml.Node:
         return list_representer(dumper, data, flow_style=cls.yaml_flow_style)
 
 
@@ -106,23 +97,23 @@ def auto_flow_list_representer(dumper, data):
     return list_representer(dumper, data, flow_style=True)
 
 
-class AutoFlowList(list, yaml.YAMLObject):
+class AutoFlowList(list, yaml.YAMLObject):  # type: ignore
     """Use flow represent only if the list has more than one line."""
     yaml_tag = '!AutoFlowList'
 
     @classmethod
-    def to_yaml(cls, dumper, data):
+    def to_yaml(cls, dumper: yaml.Dumper, data: Any) -> yaml.Node:
         return auto_flow_list_representer(dumper, data)
 
 
 # Literal String
 
-class LiteralStr(str, yaml.YAMLObject):
+class LiteralStr(str, yaml.YAMLObject):  # type: ignore
     """Represent string as Literal `|` style."""
     yaml_tag = '!LiteralStr'
 
     @classmethod
-    def to_yaml(cls, dumper, data):
+    def to_yaml(cls, dumper: yaml.Dumper, data: Any) -> yaml.Node:
         return string_representer(dumper, data, style='|')
 
 
@@ -135,12 +126,12 @@ def auto_literal_str_representer(dumper, data):
     return string_representer(dumper, data, style='"')
 
 
-class AutoLiteralStr(str, yaml.YAMLObject):
+class AutoLiteralStr(str, yaml.YAMLObject):  # type: ignore
     """Represent string as Literal `|` style."""
     yaml_tag = '!AutoLiteralStr'
 
     @classmethod
-    def to_yaml(cls, dumper, data):
+    def to_yaml(cls, dumper: yaml.Dumper, data: Any) -> yaml.Node:
         return auto_literal_str_representer(dumper, data)
 
 
