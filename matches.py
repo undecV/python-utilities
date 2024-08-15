@@ -39,9 +39,17 @@ def multiple_match(patterns: list[re.Pattern], string: str, flags: int | re.Rege
 
 
 def multiple_finditer(patterns: list[re.Pattern], string: str) -> Iterator[re.Match[str]]:
-    """Yield all matches from multiple regular expression patterns."""
+    """Yield all matches from multiple regular expression patterns applied to a string.
+    
+    Args:
+        patterns (List[re.Pattern]): A list of compiled regular expression patterns.
+        string (str): The string to search for matches.
+    
+    Yields:
+        re.Match[str]: Match objects from the `finditer` function of each pattern.
+    """
     for pattern in patterns:
-        for match_ in re.finditer(pattern, string):
+        for match_ in pattern.finditer(string):
             yield match_
 
 
