@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 import re
-from typing import Iterator
+from typing import Any, Iterator, Optional
 
 
 class BadFormatError(ValueError):
@@ -19,38 +19,44 @@ def multiple_matches(text: str, patterns: list[re.Pattern]) -> re.Match:
     return match
 
 
-def multiple_match(patterns: list[re.Pattern], string: str, flags: int | re.RegexFlag = 0) -> re.Match | None:
+def multiple_finditer(
+    patterns: list[re.Pattern[Any]], string: str
+) -> Iterator[re.Match[Any]]:
     """
-    Tries to match the given string against a list of regex patterns.
+    Yield all matches from multiple regular expression patterns applied to a
+    string.
 
     Args:
-        patterns (List[re.Pattern]): A list of compiled regex patterns.
-        string (str): The string to be matched.
-        flags (Union[int, re.RegexFlag], optional): Flags to be passed to the match function. Defaults to 0.
-
-    Returns:
-        Optional[re.Match]: The first match object if a match is found, otherwise None.
-    """
-    for pattern in patterns:
-        match = re.match(pattern, string, flags)
-        if match:
-            return match
-    return None
-
-
-def multiple_finditer(patterns: list[re.Pattern], string: str) -> Iterator[re.Match[str]]:
-    """Yield all matches from multiple regular expression patterns applied to a string.
-    
-    Args:
-        patterns (List[re.Pattern]): A list of compiled regular expression patterns.
+        patterns (List[re.Pattern[Any]]): A list of compiled regular expression
+            patterns.
         string (str): The string to search for matches.
-    
+
     Yields:
-        re.Match[str]: Match objects from the `finditer` function of each pattern.
+        re.Match[Any]: Match objects from the `finditer` function of each
+            pattern.
     """
     for pattern in patterns:
         for match_ in pattern.finditer(string):
             yield match_
+
+
+def multiple_match(
+    patterns: list[re.Pattern[Any]], string: str
+) -> Optional[re.Match[Any]]:
+    """Tries to match the given string against a list of regex patterns.
+
+    Args:
+        patterns (list[re.Pattern[Any]]): A list of compiled regex patterns.
+        string (str): The string to be matched.
+
+    Returns:
+        Optional[re.Match[Any]]: The first match object if a match is found,
+            otherwise None.
+    """
+    for pattern in patterns:
+        if match := pattern.match(string):
+            return match
+    return None
 
 
 @dataclass
